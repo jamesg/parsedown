@@ -76,6 +76,19 @@ class Parsedown
     protected $urlsLinked = true;
 
     #
+    # Set the base heading level.  This is the level that a top-level heading
+    # in the markdown input will be converted to.  Use $baseHeadingLevel=1 to
+    # leave headings as they are, $baseHeadingLevel=2 for h1 to be converted to
+    # h2, h2 to h3 etc.  Use higher levels of $baseHeadingLevel to demote
+    # headings further.
+    #
+    function setBaseHeadingLevel($baseHeadingLevel) {
+        $this->baseHeadingLevel = $baseHeadingLevel;
+    }
+
+    protected $baseHeadingLevel = 1;
+
+    #
     # Lines
     #
 
@@ -469,7 +482,7 @@ class Parsedown
     {
         if (isset($Line['text'][1]))
         {
-            $level = 1;
+            $level = $this->baseHeadingLevel;
 
             while (isset($Line['text'][$level]) and $Line['text'][$level] === '#')
             {
@@ -655,7 +668,9 @@ class Parsedown
 
         if (chop($Line['text'], $Line['text'][0]) === '')
         {
-            $Block['element']['name'] = $Line['text'][0] === '=' ? 'h1' : 'h2';
+            $Block['element']['name'] = $Line['text'][0] === '=' ?
+                ('h'.$this->baseHeadingLevel) :
+                ('h'.($this->baseHeadingLevel + 1));
 
             return $Block;
         }
